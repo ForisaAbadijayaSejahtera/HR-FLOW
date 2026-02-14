@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  api:
+    build: ./backend
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+  web:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: hrflow
+      POSTGRES_PASSWORD: hrflow
+      POSTGRES_DB: hrflow
+    ports:
+      - "5432:5432"
