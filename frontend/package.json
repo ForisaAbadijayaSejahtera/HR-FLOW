@@ -1,9 +1,0 @@
-{
-  "name": "hrflow-web",
-  "version": "1.0.0",
-  "dependencies": {
-    "next": "14",
-    "react": "18",
-    "react-dom": "18"
-  }
-}
