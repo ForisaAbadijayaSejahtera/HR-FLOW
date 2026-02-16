@@ -1,27 +1,770 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pertumbuhan Iman Kristen</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recruitment Pro - Platform Rekrutmen Cerdas</title>
+    
+    <!-- Tailwind Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#7C3AED',
+                        accent: '#EC4899',
+                        dark: '#1E1B4B',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Base styles */
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom utilities */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .workflow-line {
+            background: linear-gradient(90deg, #4F46E5, #7C3AED, #EC4899);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4F46E5;
+            border-radius: 4px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            max-width: 28rem;
+            width: 100%;
+            padding: 1.5rem;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: #1E1B4B;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            transform: translateY(5rem);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
 </head>
-<body>
-  <header>
-    <h1>Pertumbuhan Iman Kristen</h1>
-  </header>
+<body class="bg-gray-50 text-gray-800 overflow-x-hidden">
 
-  <main>
-    <section id="articles">
-      <!-- Artikel dari Supabase akan muncul di sini -->
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 transition-shadow duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">RecruitAI</span>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-primary p-2">
+                        <i class="fas fa-bars text-2xl" id="menu-icon"></i>
+                    </button>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-primary font-medium transition">Fitur</a>
+                    <a href="#dashboard" class="text-gray-600 hover:text-primary font-medium transition">Dashboard</a>
+                    <a href="#demo" class="text-gray-600 hover:text-primary font-medium transition">Demo App</a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-4">
+                    <button onclick="showToast('Fitur login dalam pengembangan')" class="text-gray-600 hover:text-primary font-medium transition">Login</button>
+                    <button onclick="scrollToSection('demo')" class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-full font-medium transition transform hover:scale-105 shadow-lg shadow-primary/30">
+                        Coba Gratis
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <a href="#features" class="block py-2 text-gray-600 hover:text-primary">Fitur</a>
+                <a href="#dashboard" class="block py-2 text-gray-600 hover:text-primary">Dashboard</a>
+                <a href="#demo" class="block py-2 text-gray-600 hover:text-primary">Demo App</a>
+                <button onclick="scrollToSection('demo')" class="w-full mt-2 bg-primary text-white py-2 rounded-lg">Coba Gratis</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50"></div>
+        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style="animation-delay: 2s;"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/80 border border-indigo-100 text-primary font-medium text-sm mb-8 shadow-sm animate-slide-up">
+                <span class="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+                Platform AI Recruitment #1 di Indonesia
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-slide-up" style="animation-delay: 0.1s;">
+                Rekrutmen <span class="gradient-text">Cerdas</span> dengan<br>
+                <span class="relative">
+                    Kecerdasan Buatan
+                    <svg class="absolute -bottom-2 left-0 w-full h-3 text-accent opacity-50" viewBox="0 0 200 9" fill="none"><path d="M2.00025 6.99997C25.7509 9.37499 83.6432 5.28589 198.001 2.00002" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+                </span>
+            </h1>
+            
+            <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto animate-slide-up" style="animation-delay: 0.2s;">
+                Optimalkan proses hiring Anda dengan AI Screening, Workflow Automation, dan HR Inbox terintegrasi.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-slide-up" style="animation-delay: 0.3s;">
+                <button onclick="scrollToSection('demo')" class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-semibold text-lg transition transform hover:scale-105 shadow-xl shadow-primary/30 flex items-center justify-center gap-2">
+                    Coba Demo <i class="fas fa-arrow-right"></i>
+                </button>
+                <button onclick="scrollToSection('features')" class="bg-white hover:bg-gray-50 text-gray-800 px-8 py-4 rounded-full font-semibold text-lg transition border-2 border-gray-200 flex items-center justify-center gap-2">
+                    <i class="fas fa-play-circle text-primary"></i> Lihat Fitur
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-slide-up" style="animation-delay: 0.4s;">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-primary counter" data-target="10000">0</div>
+                    <div class="text-sm text-gray-600">Kandidat Diproses</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-secondary">85%</div>
+                    <div class="text-sm text-gray-600">Lebih Cepat</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-accent counter" data-target="500">0</div>
+                    <div class="text-sm text-gray-600">Perusahaan</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-dark">4.9/5</div>
+                    <div class="text-sm text-gray-600">Rating Pengguna</div>
+                </div>
+            </div>
+        </div>
     </section>
-  </main>
 
-  <footer>
-    <p>&copy; 2026 Pertumbuhan Iman Kristen</p>
-  </footer>
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Fitur Utama</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">Semua yang Anda butuhkan untuk proses rekrutmen yang efisien</p>
+            </div>
 
-  <script src="app.js"></script>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature Cards -->
+                <div class="group bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover cursor-pointer" onclick="showFeatureInfo('inbox')">
+                    <div class="w-14 h-14 bg-green-500 rounded-xl flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-green-500/30">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">HR Inbox</h3>
+                    <p class="text-gray-600 mb-4">Semua WhatsApp kandidat terintegrasi dalam satu dashboard terpusat.</p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Multi-device support</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Auto-sync pesan</li>
+                    </ul>
+                </div>
+
+                <div class="group bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover cursor-pointer" onclick="showFeatureInfo('workflow')">
+                    <div class="w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-blue-500/30">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Workflow Automation</h3>
+                    <p class="text-gray-600 mb-4">Otomatisasi alur kerja dari Apply → Interview → Offering.</p>
+                    <div class="flex items-center gap-2 mt-4 bg-blue-50 p-3 rounded-lg text-xs font-semibold text-blue-700">
+                        <span>Apply</span><i class="fas fa-arrow-right text-blue-400"></span>
+                        <span>Interview</span><i class="fas fa-arrow-right text-blue-400"></span>
+                        <span>Offering</span>
+                    </div>
+                </div>
+
+                <div class="group bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover cursor-pointer" onclick="showFeatureInfo('ai')">
+                    <div class="w-14 h-14 bg-purple-500 rounded-xl flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-purple-500/30">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">AI Screening</h3>
+                    <p class="text-gray-600 mb-4">Bantu shortlist kandidat secara otomatis. HR tetap pegang kontrol.</p>
+                    <div class="mt-4">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-600">Match Score</span>
+                            <span class="font-bold text-purple-600">92%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-500 h-2 rounded-full" style="width: 92%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="group bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover cursor-pointer" onclick="showFeatureInfo('report')">
+                    <div class="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-orange-500/30">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Reporting Real-Time</h3>
+                    <p class="text-gray-600 mb-4">Data rekrutmen siap untuk owner kapan saja.</p>
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <div class="bg-orange-50 p-2 rounded text-center">
+                            <div class="text-lg font-bold text-orange-600 counter" data-target="24">0</div>
+                            <div class="text-xs text-gray-600">Aktif</div>
+                        </div>
+                        <div class="bg-orange-50 p-2 rounded text-center">
+                            <div class="text-lg font-bold text-orange-600 counter" data-target="156">0</div>
+                            <div class="text-xs text-gray-600">Hire</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="group bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover cursor-pointer" onclick="showFeatureInfo('audit')">
+                    <div class="w-14 h-14 bg-red-500 rounded-xl flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-red-500/30">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Role & Audit Log</h3>
+                    <p class="text-gray-600 mb-4">Sistem aman dengan kontrol akses berbasis peran.</p>
+                    <div class="flex items-center gap-2 mt-4">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-red-200 border-2 border-white flex items-center justify-center text-xs font-bold text-red-700">A</div>
+                            <div class="w-8 h-8 rounded-full bg-red-300 border-2 border-white flex items-center justify-center text-xs font-bold text-red-700">H</div>
+                            <div class="w-8 h-8 rounded-full bg-red-400 border-2 border-white flex items-center justify-center text-xs font-bold text-white">M</div>
+                        </div>
+                        <span class="text-sm text-gray-500">3 Level Akses</span>
+                    </div>
+                </div>
+
+                <div class="group bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover cursor-pointer" onclick="showFeatureInfo('integration')">
+                    <div class="w-14 h-14 bg-indigo-500 rounded-xl flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-indigo-500/30">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Integrasi Lengkap</h3>
+                    <p class="text-gray-600 mb-4">Terhubung dengan job portal, calendar, dan HRIS.</p>
+                    <div class="flex gap-2 mt-4">
+                        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600"><i class="fab fa-google"></i></div>
+                        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600"><i class="fab fa-microsoft"></i></div>
+                        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600"><i class="fas fa-calendar"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Working Demo App -->
+    <section id="demo" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Coba Demo Aplikasi</h2>
+                <p class="text-gray-600">Data tersimpan di browser Anda (localStorage)</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Add Candidate Form -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fas fa-user-plus text-primary"></i> Tambah Kandidat
+                    </h3>
+                    <form id="candidateForm" onsubmit="addCandidate(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                            <input type="text" id="candidateName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" placeholder="John Doe">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Posisi</label>
+                            <select id="candidatePosition" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none">
+                                <option value="Developer">Developer</option>
+                                <option value="Designer">Designer</option>
+                                <option value="Product Manager">Product Manager</option>
+                                <option value="Marketing">Marketing</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
+                            <input type="tel" id="candidatePhone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="08123456789">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Stage</label>
+                            <select id="candidateStage" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none">
+                                <option value="Apply">Apply</option>
+                                <option value="AI Screening">AI Screening</option>
+                                <option value="Interview">Interview</option>
+                                <option value="Offering">Offering</option>
+                                <option value="Hired">Hired</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition transform hover:scale-[1.02]">
+                            <i class="fas fa-plus mr-2"></i>Tambah Kandidat
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Candidate List -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <h3 class="text-xl font-bold flex items-center gap-2">
+                            <i class="fas fa-list text-secondary"></i> Daftar Kandidat
+                            <span id="candidateCount" class="bg-gray-100 text-gray-600 text-sm px-2 py-1 rounded-full">0</span>
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterCandidates('all')" class="filter-btn px-3 py-1 text-sm rounded-full bg-primary text-white transition" data-filter="all">Semua</button>
+                            <button onclick="filterCandidates('Apply')" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition" data-filter="Apply">Apply</button>
+                            <button onclick="filterCandidates('Interview')" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition" data-filter="Interview">Interview</button>
+                            <button onclick="filterCandidates('Hired')" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition" data-filter="Hired">Hired</button>
+                        </div>
+                    </div>
+                    
+                    <div id="candidateList" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                        <div class="text-center text-gray-500 py-12">
+                            <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                            <p>Belum ada kandidat. Tambahkan di form sebelah kiri!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Screening -->
+            <div class="mt-8 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                    <i class="fas fa-magic text-accent"></i> AI Screening Simulator
+                </h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Job Description</label>
+                        <textarea id="jobDesc" rows="4" class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="React developer with 3+ years experience..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">CV (Text)</label>
+                        <textarea id="cvText" rows="4" class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="5 years React, Node.js, TypeScript..."></textarea>
+                    </div>
+                    <div class="flex flex-col justify-center items-center bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border-2 border-dashed border-purple-200">
+                        <button onclick="runAIScreening()" class="bg-accent text-white px-6 py-3 rounded-full font-semibold hover:bg-accent/90 transition shadow-lg mb-4">
+                            <i class="fas fa-robot mr-2"></i>Analisis
+                        </button>
+                        <div id="aiResult" class="text-center hidden w-full">
+                            <div class="text-4xl font-bold text-accent mb-1" id="matchScore">0%</div>
+                            <div class="text-sm text-gray-600 mb-2">Match Score</div>
+                            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                                <div id="matchBar" class="bg-accent h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500" id="aiInsight">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-20 bg-gradient-to-r from-primary to-secondary text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">Siap Merekrut Lebih Cerdas?</h2>
+            <p class="text-xl mb-10 text-white/90">Bergabung dengan 500+ perusahaan yang telah mengoptimasi proses hiring</p>
+            <button onclick="showToast('Terima kasih! Tim kami akan menghubungi Anda.')" class="bg-white text-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-xl">
+                Mulai Trial Gratis 14 Hari
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-brain text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold">RecruitAI</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">Platform AI recruitment terdepan untuk perusahaan modern.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Produk</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#features" class="hover:text-white transition">HR Inbox</a></li>
+                        <li><a href="#features" class="hover:text-white transition">AI Screening</a></li>
+                        <li><a href="#features" class="hover:text-white transition">Workflow</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Perusahaan</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" onclick="showToast('Coming soon!')" class="hover:text-white transition">Tentang Kami</a></li>
+                        <li><a href="#" onclick="showToast('Coming soon!')" class="hover:text-white transition">Karir</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Kontak</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><i class="fas fa-envelope mr-2"></i> hello@recruitai.id</li>
+                        <li><i class="fas fa-phone mr-2"></i> +62 21 1234 5678</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
+                © 2024 RecruitAI. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Data Management
+        let candidates = JSON.parse(localStorage.getItem('recruitai_candidates')) || [];
+        let currentFilter = 'all';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCandidates();
+            animateCounters();
+        });
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            menu.classList.toggle('hidden');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        }
+
+        // Candidate Functions
+        function addCandidate(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('candidateName').value;
+            const position = document.getElementById('candidatePosition').value;
+            const phone = document.getElementById('candidatePhone').value;
+            const stage = document.getElementById('candidateStage').value;
+            
+            const candidate = {
+                id: Date.now(),
+                name,
+                position,
+                phone,
+                stage,
+                matchScore: Math.floor(Math.random() * (98 - 75) + 75),
+                date: new Date().toLocaleDateString('id-ID'),
+                initials: name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+            };
+            
+            candidates.unshift(candidate);
+            localStorage.setItem('recruitai_candidates', JSON.stringify(candidates));
+            
+            renderCandidates();
+            document.getElementById('candidateForm').reset();
+            showToast('Kandidat berhasil ditambahkan!');
+        }
+
+        function renderCandidates() {
+            const list = document.getElementById('candidateList');
+            const count = document.getElementById('candidateCount');
+            
+            const filtered = currentFilter === 'all' 
+                ? candidates 
+                : candidates.filter(c => c.stage === currentFilter);
+            
+            count.textContent = filtered.length;
+            
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center text-gray-500 py-12">
+                        <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                        <p>${currentFilter === 'all' ? 'Belum ada kandidat. Tambahkan di form sebelah kiri!' : 'Tidak ada kandidat di stage ini.'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = filtered.map(c => `
+                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border border-gray-100 group">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        ${c.initials}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-gray-800 truncate">${c.name}</div>
+                        <div class="text-sm text-gray-500">${c.position} • Match ${c.matchScore}%</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select onchange="updateStage(${c.id}, this.value)" class="text-xs border border-gray-300 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-primary outline-none cursor-pointer">
+                            <option value="Apply" ${c.stage === 'Apply' ? 'selected' : ''}>Apply</option>
+                            <option value="AI Screening" ${c.stage === 'AI Screening' ? 'selected' : ''}>AI Screening</option>
+                            <option value="Interview" ${c.stage === 'Interview' ? 'selected' : ''}>Interview</option>
+                            <option value="Offering" ${c.stage === 'Offering' ? 'selected' : ''}>Offering</option>
+                            <option value="Hired" ${c.stage === 'Hired' ? 'selected' : ''}>Hired</option>
+                        </select>
+                        <button onclick="deleteCandidate(${c.id})" class="text-red-400 hover:text-red-600 p-1 opacity-0 group-hover:opacity-100 transition">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStage(id, newStage) {
+            const candidate = candidates.find(c => c.id === id);
+            if (candidate) {
+                candidate.stage = newStage;
+                localStorage.setItem('recruitai_candidates', JSON.stringify(candidates));
+                renderCandidates();
+                showToast(`Status ${candidate.name} diupdate ke ${newStage}`);
+            }
+        }
+
+        function deleteCandidate(id) {
+            if (confirm('Yakin ingin menghapus kandidat ini?')) {
+                candidates = candidates.filter(c => c.id !== id);
+                localStorage.setItem('recruitai_candidates', JSON.stringify(candidates));
+                renderCandidates();
+                showToast('Kandidat dihapus');
+            }
+        }
+
+        function filterCandidates(stage) {
+            currentFilter = stage;
+            
+            // Update button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === stage) {
+                    btn.classList.remove('bg-gray-200', 'text-gray-700');
+                    btn.classList.add('bg-primary', 'text-white');
+                } else {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            });
+            
+            renderCandidates();
+        }
+
+        // AI Screening
+        function runAIScreening() {
+            const jobDesc = document.getElementById('jobDesc').value.toLowerCase();
+            const cvText = document.getElementById('cvText').value.toLowerCase();
+            
+            if (!jobDesc || !cvText) {
+                showToast('Mohon isi Job Description dan CV!', 'error');
+                return;
+            }
+            
+            const jobWords = jobDesc.split(/\s+/).filter(w => w.length > 3);
+            const cvWords = cvText.split(/\s+/).filter(w => w.length > 3);
+            
+            let matches = 0;
+            jobWords.forEach(word => {
+                if (cvWords.some(cvWord => cvWord.includes(word) || word.includes(cvWord))) {
+                    matches++;
+                }
+            });
+            
+            const score = Math.min(Math.round((matches / jobWords.length) * 100) + 20, 98);
+            
+            document.getElementById('aiResult').classList.remove('hidden');
+            document.getElementById('matchScore').textContent = score + '%';
+            document.getElementById('matchBar').style.width = score + '%';
+            
+            let insight = '';
+            if (score >= 90) insight = 'Kandidat sangat cocok! Lanjutkan ke interview.';
+            else if (score >= 75) insight = 'Cukup cocok. Pertimbangkan screening lanjutan.';
+            else insight = 'Kurang cocok. Cari alternatif lain.';
+            
+            document.getElementById('aiInsight').textContent = insight;
+            showToast('Analisis AI selesai!');
+        }
+
+        // Utilities
+        function showToast(message, type = 'success') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <i class="fas ${type === 'error' ? 'fa-exclamation-circle text-red-400' : 'fa-check-circle text-green-400'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            requestAnimationFrame(() => toast.classList.add('show'));
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showFeatureInfo(feature) {
+            const info = {
+                'inbox': 'HR Inbox: Integrasi WhatsApp Business API untuk mengelola semua chat kandidat dalam satu dashboard.',
+                'workflow': 'Workflow Automation: Buat aturan otomatis, misalnya kandidat dengan match >85% langsung dijadwalkan interview.',
+                'ai': 'AI Screening: Natural Language Processing menganalisis CV dan mencocokkan dengan job description.',
+                'report': 'Real-time Reporting: Dashboard interaktif dengan metrics hiring funnel, time-to-hire, dan source effectiveness.',
+                'audit': 'Audit Log: Lacak setiap aktivitas user - siapa yang mengubah data, kapan, dan dari mana.',
+                'integration': 'Integrasi: Connect dengan LinkedIn, JobStreet, Google Calendar, Zoom, dan HRIS populer.'
+            };
+            showToast(info[feature]);
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            // Close mobile menu if open
+            document.getElementById('mobile-menu')?.classList.add('hidden');
+        }
+
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const target = parseInt(counter.dataset.target);
+                const duration = 2000;
+                const step = target / (duration / 16);
+                let current = 0;
+                
+                const update = () => {
+                    current += step;
+                    if (current < target) {
+                        counter.textContent = Math.floor(current).toLocaleString();
+                        requestAnimationFrame(update);
+                    } else {
+                        counter.textContent = target.toLocaleString();
+                    }
+                };
+                
+                // Trigger when in viewport
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            update();
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                });
+                
+                observer.observe(counter);
+            });
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-md');
+            } else {
+                nav.classList.remove('shadow-md');
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
