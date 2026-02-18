@@ -53,6 +53,16 @@
             transform: rotate(2deg);
         }
         
+        .drop-zone {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s;
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #4F46E5;
+            background: #eef2ff;
+        }
+        
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -128,10 +138,6 @@
         ::-webkit-scrollbar-thumb {
             background: #4F46E5;
             border-radius: 4px;
-        }
-        
-        @media print {
-            .no-print { display: none !important; }
         }
     </style>
 </head>
@@ -491,36 +497,157 @@
             <!-- AI SCREENING -->
             <div id="page-ai-screening" class="page-content hidden">
                 <h1 class="text-2xl font-bold mb-6">AI Screening</h1>
-                <div class="grid lg:grid-cols-2 gap-6">
+                
+                <!-- Upload Area -->
+                <div class="grid lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Job Description -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold mb-4">Job Description</h3>
-                        <textarea id="aiJobDesc" rows="10" class="w-full p-4 border border-gray-300 rounded-lg outline-none resize-none" placeholder="Paste job description..."></textarea>
+                        <h3 class="font-bold mb-4 flex items-center gap-2">
+                            <i class="fas fa-briefcase text-primary"></i>
+                            Job Description
+                        </h3>
+                        <select id="selectJobDesc" onchange="loadJobDescription()" class="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg outline-none text-sm">
+                            <option value="">-- Pilih posisi tersimpan --</option>
+                            <option value="developer">Senior Developer</option>
+                            <option value="designer">UI/UX Designer</option>
+                            <option value="pm">Product Manager</option>
+                            <option value="marketing">Digital Marketing</option>
+                        </select>
+                        <textarea id="aiJobDesc" rows="8" class="w-full p-4 border border-gray-300 rounded-lg outline-none resize-none" placeholder="Paste job description..."></textarea>
                     </div>
+                    
+                    <!-- CV Upload Area -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold mb-4">Candidate CV</h3>
-                        <textarea id="aiCV" rows="10" class="w-full p-4 border border-gray-300 rounded-lg outline-none resize-none" placeholder="Paste CV text..."></textarea>
-                    </div>
-                </div>
-                <div class="mt-6 text-center">
-                    <button onclick="runAIScreening()" class="text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-lg transition" style="background: linear-gradient(135deg, #4F46E5, #7C3AED);">
-                        <i class="fas fa-robot mr-2"></i>Analyze with AI
-                    </button>
-                </div>
-                <div id="aiResults" class="hidden mt-8 grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-lg border-2 text-center" style="border-color: #4F46E5;">
-                        <div class="text-5xl font-bold mb-2" style="color: #4F46E5;" id="overallScore">0%</div>
-                        <div class="text-gray-600">Overall Match</div>
-                        <div class="mt-4 w-full bg-gray-200 rounded-full h-3">
-                            <div id="overallBar" class="h-3 rounded-full transition-all duration-1000" style="width: 0%; background: #4F46E5;"></div>
+                        <h3 class="font-bold mb-4 flex items-center gap-2">
+                            <i class="fas fa-file-alt text-secondary"></i>
+                            Upload CV
+                        </h3>
+                        
+                        <!-- Drag Drop Zone -->
+                        <div id="dropZone" 
+                             class="drop-zone rounded-lg p-8 text-center cursor-pointer"
+                             onclick="document.getElementById('fileInput').click()">
+                            
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+                            <p class="text-gray-600 font-medium">Drag & drop CV di sini</p>
+                            <p class="text-gray-400 text-sm mt-1">atau klik untuk browse</p>
+                            <p class="text-gray-400 text-xs mt-2">Support: PDF, DOC, DOCX, TXT</p>
+                            
+                            <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx,.txt" onchange="handleFileSelect(event)">
+                        </div>
+                        
+                        <!-- Selected File Info -->
+                        <div id="fileInfo" class="hidden mt-4 p-3 bg-green-50 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-file-alt text-green-600 text-xl"></i>
+                                <div>
+                                    <p class="font-medium text-sm" id="fileName">filename.pdf</p>
+                                    <p class="text-xs text-gray-500" id="fileSize">2.5 MB</p>
+                                </div>
+                            </div>
+                            <button onclick="clearFile()" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Manual Input -->
+                        <div class="mt-4">
+                            <p class="text-xs text-gray-500 mb-2">Atau paste text CV:</p>
+                            <textarea id="aiCV" rows="5" class="w-full p-3 border border-gray-300 rounded-lg outline-none resize-none text-sm" placeholder="Paste isi CV di sini..."></textarea>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h4 class="font-semibold mb-3">Skills Match</h4>
-                        <div id="skillsMatch" class="space-y-2"></div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="text-center mb-8">
+                    <button onclick="runAIScreening()" id="analyzeBtn" class="text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-lg transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed" style="background: linear-gradient(135deg, #4F46E5, #7C3AED);">
+                        <i class="fas fa-robot mr-2"></i>Analyze with AI
+                    </button>
+                    <p class="text-gray-400 text-sm mt-2" id="analyzeHint">Isi Job Description dan upload CV terlebih dahulu</p>
+                </div>
+                
+                <!-- Results -->
+                <div id="aiResults" class="hidden mb-8">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-2 text-center" style="border-color: #4F46E5;">
+                            <div class="text-5xl font-bold mb-2" style="color: #4F46E5;" id="overallScore">0%</div>
+                            <div class="text-gray-600">Overall Match</div>
+                            <div class="mt-4 w-full bg-gray-200 rounded-full h-3">
+                                <div id="overallBar" class="h-3 rounded-full transition-all duration-1000" style="width: 0%; background: #4F46E5;"></div>
+                            </div>
+                            <div class="mt-3 text-sm" id="scoreLabel">Analyzing...</div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h4 class="font-semibold mb-3 flex items-center gap-2">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                Matched Skills
+                            </h4>
+                            <div id="skillsMatch" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h4 class="font-semibold mb-3 flex items-center gap-2">
+                                <i class="fas fa-times-circle text-red-500"></i>
+                                Missing Skills
+                            </h4>
+                            <div id="missingSkills" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                        </div>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h4 class="font-semibold mb-3">AI Recommendation</h4>
-                        <p id="aiRecommendation" class="text-gray-600 text-sm"></p>
+                    
+                    <div class="mt-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h4 class="font-semibold mb-3 flex items-center gap-2">
+                            <i class="fas fa-lightbulb text-yellow-500"></i>
+                            AI Recommendation
+                        </h4>
+                        <p id="aiRecommendation" class="text-gray-700 leading-relaxed"></p>
+                        
+                        <div class="mt-4 flex gap-3">
+                            <button onclick="addToPipeline()" class="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition font-medium">
+                                <i class="fas fa-plus mr-2"></i>Add to Pipeline
+                            </button>
+                            <button onclick="saveScreeningResult()" class="flex-1 border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition">
+                                <i class="fas fa-save mr-2"></i>Save Result
+                            </button>
+                            <button onclick="rejectCandidate()" class="px-4 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Screening History -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                    <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold flex items-center gap-2">
+                            <i class="fas fa-history text-gray-400"></i>
+                            Screening History
+                        </h3>
+                        <button onclick="clearHistory()" class="text-sm text-red-500 hover:underline">
+                            Clear History
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left px-6 py-3 text-sm font-semibold text-gray-600">Candidate</th>
+                                    <th class="text-left px-6 py-3 text-sm font-semibold text-gray-600">Position</th>
+                                    <th class="text-left px-6 py-3 text-sm font-semibold text-gray-600">Score</th>
+                                    <th class="text-left px-6 py-3 text-sm font-semibold text-gray-600">Status</th>
+                                    <th class="text-left px-6 py-3 text-sm font-semibold text-gray-600">Date</th>
+                                    <th class="text-left px-6 py-3 text-sm font-semibold text-gray-600">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="screeningHistory" class="divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="6" class="text-center py-8 text-gray-500">
+                                        <i class="fas fa-inbox text-3xl mb-2 text-gray-300"></i>
+                                        <p>Belum ada screening</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -655,11 +782,14 @@
 </div>
 
 <script>
-// ==================== DATA ====================
+// ==================== DATA & STATE ====================
 let currentUser = null;
 let candidates = [];
 let currentChat = null;
 let charts = {};
+let currentFile = null;
+let screeningHistory = [];
+let lastScreeningResult = null;
 
 const DEFAULT_USERS = [
     { email: 'admin@company.com', password: 'admin123', name: 'Administrator', role: 'Admin', avatar: 'https://ui-avatars.com/api/?name=Administrator&background=4F46E5&color=fff' },
@@ -673,10 +803,57 @@ const SAMPLE_CANDIDATES = [
     { id: 3, name: 'Ahmad Fauzi', email: 'ahmad@email.com', phone: '081356789012', position: 'Product Manager', stage: 'Offering', source: 'JobStreet', matchScore: 95, date: '2024-01-14', resume: 'PM 4 years, Agile, Scrum', messages: [{text: 'Saya terima offering ini', sent: false, time: '14:30'}] }
 ];
 
+const JOB_DESCRIPTIONS = {
+    'developer': `Senior Frontend Developer
+    
+Requirements:
+- 5+ years experience with React.js
+- Strong TypeScript skills
+- Experience with Next.js or similar frameworks
+- Knowledge of state management (Redux, Zustand)
+- Understanding of CI/CD pipelines
+- Experience with testing (Jest, React Testing Library)
+- Good communication skills`,
+
+    'designer': `UI/UX Designer
+    
+Requirements:
+- 3+ years experience in UI/UX design
+- Proficient in Figma and Adobe Creative Suite
+- Strong portfolio demonstrating user-centered design
+- Experience with design systems
+- Knowledge of HTML/CSS basics
+- Ability to conduct user research
+- Excellent visual design skills`,
+
+    'pm': `Product Manager
+    
+Requirements:
+- 4+ years experience in product management
+- Experience with Agile/Scrum methodologies
+- Strong analytical and problem-solving skills
+- Excellent stakeholder management
+- Data-driven decision making
+- Technical background preferred
+- Experience with product analytics tools`,
+
+    'marketing': `Digital Marketing Specialist
+    
+Requirements:
+- 3+ years experience in digital marketing
+- SEO/SEM expertise
+- Social media marketing experience
+- Content creation skills
+- Google Analytics certified
+- Experience with marketing automation tools
+- Strong copywriting skills`
+};
+
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
     const savedUser = localStorage.getItem('recruitai_user');
     const savedCandidates = localStorage.getItem('recruitai_candidates');
+    const savedHistory = localStorage.getItem('recruitai_screening');
     
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
@@ -685,13 +862,28 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (savedCandidates) {
         candidates = JSON.parse(savedCandidates);
-    } else {
-        candidates = [];
     }
+    
+    if (savedHistory) {
+        screeningHistory = JSON.parse(savedHistory);
+    }
+    
+    // Setup drag and drop
+    setupDragDrop();
+    
+    // Setup input listeners
+    const jobDesc = document.getElementById('aiJobDesc');
+    const cv = document.getElementById('aiCV');
+    if (jobDesc) jobDesc.addEventListener('input', updateAnalyzeButton);
+    if (cv) cv.addEventListener('input', updateAnalyzeButton);
 });
 
 function saveData() {
     localStorage.setItem('recruitai_candidates', JSON.stringify(candidates));
+}
+
+function saveScreeningHistory() {
+    localStorage.setItem('recruitai_screening', JSON.stringify(screeningHistory));
 }
 
 // ==================== AUTH ====================
@@ -746,7 +938,6 @@ function initApp() {
     document.getElementById('userRoleDisplay').textContent = currentUser.role;
     document.getElementById('userAvatar').src = currentUser.avatar;
     document.getElementById('settingName').value = currentUser.name;
-    document.getElementById('settingEmail') && (document.getElementById('settingEmail').value = currentUser.email);
     
     document.getElementById('loginPage').classList.add('hidden');
     document.getElementById('mainApp').classList.remove('hidden');
@@ -755,6 +946,7 @@ function initApp() {
     renderCandidatesTable();
     renderPipeline();
     renderChatList();
+    renderScreeningHistory();
     initCharts();
 }
 
@@ -778,6 +970,7 @@ function showPage(pageName) {
     if (pageName === 'pipeline') renderPipeline();
     if (pageName === 'inbox') renderChatList();
     if (pageName === 'reports') updateReports();
+    if (pageName === 'ai-screening') renderScreeningHistory();
     
     if (window.innerWidth < 768) {
         document.getElementById('sidebar').classList.add('-translate-x-full');
@@ -1207,47 +1400,335 @@ function startChat(candidateId) {
 }
 
 // ==================== AI SCREENING ====================
+function setupDragDrop() {
+    const dropZone = document.getElementById('dropZone');
+    if (!dropZone) return;
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
+    });
+    
+    dropZone.addEventListener('drop', handleDrop, false);
+}
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length > 0) {
+        processFile(files[0]);
+    }
+}
+
+function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) {
+        processFile(file);
+    }
+}
+
+function processFile(file) {
+    const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt'];
+    const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+    
+    if (!allowedExtensions.includes(fileExtension)) {
+        showToast('File type tidak didukung. Gunakan PDF, DOC, DOCX, atau TXT', 'error');
+        return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('File terlalu besar. Max 5MB', 'error');
+        return;
+    }
+    
+    currentFile = file;
+    
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = formatFileSize(file.size);
+    document.getElementById('fileInfo').classList.remove('hidden');
+    
+    // Simulate text extraction
+    setTimeout(() => {
+        document.getElementById('aiCV').value = simulateExtractedText();
+        updateAnalyzeButton();
+    }, 500);
+    
+    showToast('File uploaded: ' + file.name, 'success');
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function simulateExtractedText() {
+    return `JOHN DOE
+Software Engineer
+Email: john@example.com | Phone: 081234567890
+
+EXPERIENCE:
+- Senior Developer at Tech Corp (2019-2024)
+  * Built React applications with TypeScript
+  * Led team of 5 developers
+  * Implemented CI/CD pipelines
+  
+- Frontend Developer at StartupX (2016-2019)
+  * Developed responsive web applications
+  * Worked with Redux and Node.js
+
+SKILLS:
+JavaScript, React, TypeScript, Node.js, Git, Agile, CSS, HTML
+
+EDUCATION:
+Bachelor of Computer Science, University of Indonesia (2012-2016)`;
+}
+
+function clearFile() {
+    currentFile = null;
+    document.getElementById('fileInput').value = '';
+    document.getElementById('fileInfo').classList.add('hidden');
+    document.getElementById('aiCV').value = '';
+    updateAnalyzeButton();
+}
+
+function loadJobDescription() {
+    const select = document.getElementById('selectJobDesc');
+    const key = select.value;
+    if (key && JOB_DESCRIPTIONS[key]) {
+        document.getElementById('aiJobDesc').value = JOB_DESCRIPTIONS[key];
+        showToast('Job description loaded', 'success');
+        updateAnalyzeButton();
+    }
+}
+
+function updateAnalyzeButton() {
+    const hasJD = document.getElementById('aiJobDesc')?.value.trim().length > 0;
+    const hasCV = document.getElementById('aiCV')?.value.trim().length > 0;
+    const btn = document.getElementById('analyzeBtn');
+    const hint = document.getElementById('analyzeHint');
+    
+    if (!btn) return;
+    
+    if (hasJD && hasCV) {
+        btn.disabled = false;
+        hint.textContent = 'Siap untuk analyze';
+        hint.classList.add('text-green-500');
+    } else {
+        btn.disabled = true;
+        hint.textContent = 'Isi Job Description dan upload CV terlebih dahulu';
+        hint.classList.remove('text-green-500');
+    }
+}
+
 function runAIScreening() {
     const jobDesc = document.getElementById('aiJobDesc').value;
     const cv = document.getElementById('aiCV').value;
     
     if (!jobDesc || !cv) {
-        showToast('Isi Job Description dan CV', 'error');
+        showToast('Lengkapi Job Description dan CV', 'error');
         return;
     }
     
-    const jobWords = jobDesc.toLowerCase().match(/\b\w{4,}\b/g) || [];
-    const cvWords = cv.toLowerCase().match(/\b\w{4,}\b/g) || [];
+    const requirements = jobDesc.split('\n').filter(line => 
+        line.trim().startsWith('-') || 
+        line.trim().startsWith('•') || 
+        line.includes('years') ||
+        line.includes('experience')
+    );
     
+    const cvWords = cv.toLowerCase().match(/\b\w{4,}\b/g) || [];
     const matchedSkills = [];
+    const missingSkills = [];
     let matchCount = 0;
     
-    jobWords.forEach(word => {
-        if (cvWords.some(cvWord => cvWord.includes(word) || word.includes(cvWord))) {
-            matchCount++;
-            if (!matchedSkills.includes(word)) matchedSkills.push(word);
+    requirements.forEach(req => {
+        const reqWords = req.toLowerCase().match(/\b\w{4,}\b/g) || [];
+        let reqMatched = false;
+        
+        reqWords.forEach(word => {
+            if (cvWords.some(cvWord => cvWord.includes(word) || word.includes(cvWord))) {
+                if (!matchedSkills.includes(word)) matchedSkills.push(word);
+                reqMatched = true;
+                matchCount++;
+            }
+        });
+        
+        if (!reqMatched && reqWords.length > 0) {
+            missingSkills.push(req.replace(/^[-•]\s*/, '').trim());
         }
     });
     
-    const overallScore = Math.min(Math.round((matchCount / jobWords.length) * 100) + 15, 98);
+    const overallScore = Math.min(Math.round((matchCount / Math.max(requirements.length, 1)) * 100), 98);
     
     document.getElementById('aiResults').classList.remove('hidden');
     document.getElementById('overallScore').textContent = overallScore + '%';
     document.getElementById('overallBar').style.width = overallScore + '%';
     
-    document.getElementById('skillsMatch').innerHTML = matchedSkills.slice(0, 5).map(skill => `
-        <div class="flex items-center gap-2 text-sm">
-            <i class="fas fa-check-circle text-green-500"></i>
+    const bar = document.getElementById('overallBar');
+    const scoreLabel = document.getElementById('scoreLabel');
+    
+    if (overallScore >= 85) {
+        bar.style.background = '#10b981';
+        scoreLabel.textContent = 'Excellent Match';
+        scoreLabel.className = 'mt-3 text-sm font-semibold text-green-600';
+    } else if (overallScore >= 70) {
+        bar.style.background = '#f59e0b';
+        scoreLabel.textContent = 'Good Match';
+        scoreLabel.className = 'mt-3 text-sm font-semibold text-yellow-600';
+    } else {
+        bar.style.background = '#ef4444';
+        scoreLabel.textContent = 'Poor Match';
+        scoreLabel.className = 'mt-3 text-sm font-semibold text-red-600';
+    }
+    
+    document.getElementById('skillsMatch').innerHTML = matchedSkills.slice(0, 8).map(skill => `
+        <div class="flex items-center gap-2 text-sm p-2 bg-green-50 rounded">
+            <i class="fas fa-check text-green-500"></i>
             <span>${skill}</span>
         </div>
     `).join('') || '<p class="text-gray-500 text-sm">Tidak ada skill cocok</p>';
     
-    let rec = overallScore >= 90 ? 'Excellent match! Langsung interview.' : 
-              overallScore >= 75 ? 'Good match. Screening dulu.' : 
-              overallScore >= 60 ? 'Partial match. Pertimbangkan.' : 'Poor match. Tidak direkomendasikan.';
+    document.getElementById('missingSkills').innerHTML = missingSkills.slice(0, 5).map(skill => `
+        <div class="flex items-center gap-2 text-sm p-2 bg-red-50 rounded">
+            <i class="fas fa-times text-red-500"></i>
+            <span>${skill.substring(0, 50)}${skill.length > 50 ? '...' : ''}</span>
+        </div>
+    `).join('') || '<p class="text-gray-500 text-sm">Tidak ada skill missing</p>';
     
-    document.getElementById('aiRecommendation').textContent = rec;
+    let rec = overallScore >= 85 ? '🟢 STRONG RECOMMENDATION: Kandidat sangat cocok! Langsung interview.' : 
+              overallScore >= 70 ? '🟡 MODERATE MATCH: Cukup cocok. Screening interview dulu.' : 
+              overallScore >= 50 ? '🟠 CONDITIONAL: Kurang ideal. Pertimbangkan untuk junior role.' : 
+              '🔴 NOT RECOMMENDED: Match sangat rendah.';
+    
+    document.getElementById('aiRecommendation').innerHTML = rec;
+    
+    lastScreeningResult = {
+        score: overallScore,
+        jobDesc: jobDesc.substring(0, 100) + '...',
+        cv: cv.substring(0, 100) + '...',
+        matched: matchedSkills,
+        missing: missingSkills,
+        timestamp: new Date().toISOString()
+    };
+    
     showToast('Analisis AI selesai!', 'success');
+    document.getElementById('aiResults').scrollIntoView({ behavior: 'smooth' });
+}
+
+function addToPipeline() {
+    if (!lastScreeningResult) return;
+    
+    const cvText = document.getElementById('aiCV').value;
+    const nameMatch = cvText.match(/^([A-Z][a-z]+ [A-Z][a-z]+)/m);
+    const emailMatch = cvText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    const phoneMatch = cvText.match(/(\+62|62|0)8[1-9][0-9]{6,9}/);
+    
+    openAddModal();
+    
+    if (nameMatch) document.querySelector('input[name="name"]').value = nameMatch[1];
+    if (emailMatch) document.querySelector('input[name="email"]').value = emailMatch[0];
+    if (phoneMatch) document.querySelector('input[name="phone"]').value = phoneMatch[0];
+    document.querySelector('textarea[name="resume"]').value = cvText;
+    
+    showToast('Data diisi otomatis dari CV. Lengkapi dan save!', 'success');
+}
+
+function saveScreeningResult() {
+    if (!lastScreeningResult) return;
+    
+    const cvText = document.getElementById('aiCV').value;
+    const candidateName = cvText.match(/^([A-Z][a-z]+ [A-Z][a-z]+)/m)?.[1] || 'Unknown';
+    const position = document.getElementById('selectJobDesc')?.options[document.getElementById('selectJobDesc').selectedIndex]?.text || 'Unknown Position';
+    
+    const historyItem = {
+        id: Date.now(),
+        candidateName: candidateName,
+        position: position,
+        score: lastScreeningResult.score,
+        status: lastScreeningResult.score >= 70 ? 'Shortlisted' : 'Rejected',
+        date: new Date().toLocaleDateString('id-ID'),
+        details: lastScreeningResult
+    };
+    
+    screeningHistory.unshift(historyItem);
+    saveScreeningHistory();
+    renderScreeningHistory();
+    showToast('Screening result saved!', 'success');
+}
+
+function renderScreeningHistory() {
+    const tbody = document.getElementById('screeningHistory');
+    if (!tbody) return;
+    
+    if (screeningHistory.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-8 text-gray-500">
+                    <i class="fas fa-inbox text-3xl mb-2 text-gray-300"></i>
+                    <p>Belum ada screening</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = screeningHistory.map(item => `
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 font-medium">${item.candidateName}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">${item.position}</td>
+            <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                        <div class="h-2 rounded-full ${item.score >= 70 ? 'bg-green-500' : 'bg-red-500'}" style="width: ${item.score}%"></div>
+                    </div>
+                    <span class="text-sm font-medium">${item.score}%</span>
+                </div>
+            </td>
+            <td class="px-6 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-semibold ${item.status === 'Shortlisted' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    ${item.status}
+                </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">${item.date}</td>
+            <td class="px-6 py-4">
+                <button onclick="alert('Score: ${item.score}%\\nMatched: ${item.details.matched.join(', ')}')" class="text-primary hover:underline text-sm">
+                    View
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function clearHistory() {
+    if (!confirm('Hapus semua history screening?')) return;
+    screeningHistory = [];
+    saveScreeningHistory();
+    renderScreeningHistory();
+    showToast('History cleared', 'info');
+}
+
+function rejectCandidate() {
+    if (!lastScreeningResult) return;
+    saveScreeningResult();
+    showToast('Candidate rejected and saved', 'info');
+    clearFile();
+    document.getElementById('aiJobDesc').value = '';
+    document.getElementById('aiResults').classList.add('hidden');
 }
 
 // ==================== DASHBOARD & REPORTS ====================
@@ -1484,3 +1965,4 @@ window.onclick = function(event) {
 
 </body>
 </html>
+
